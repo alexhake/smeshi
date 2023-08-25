@@ -34,7 +34,7 @@ class Smesher:
         }
         self.pulse = []
         self.config = config
-        
+
     def get_smesher_data(self):
         return self.smesher_data
     
@@ -49,3 +49,27 @@ class Smesher:
     
     def get_pulse(self):
         return self.pulse
+    
+    def set_smesher_data(self, smesher_data):
+        self.smesher_data = smesher_data
+    
+    def set_gpu_data(self, gpu_data):
+        self.gpu_data = gpu_data
+
+    def set_post_data(self, post_data):
+        self.post_data = post_data
+
+    def set_status_data(self, status_data):
+        self.status_data = status_data
+
+    def set_pulse(self):
+        self.pulse.append({
+            "Smesher Data": self.smesher_data,
+            "GPU Data": self.gpu_data,
+            "Post Data": self.post_data,
+            "Status_Data": self.status_data
+        })
+
+        # Remove oldest entry
+        if len(self.pulse) > self.config["pulse_length"]:
+            self.pulse.pop(0)

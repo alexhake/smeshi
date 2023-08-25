@@ -7,5 +7,6 @@
     "state_table_name": "smesh-states",
     "name": "Whiskey",
     "privacy_mode": 1,
-    "password": "test"
+    "password": "test",
+    "pulse_length": 5
 }
