@@ -1,0 +1,11 @@
+{
+    "wait_time": 5,
+    "post_data_dir": "/home/hakehw/Apps/postcli/postdata",
+    "max_errors": 5,
+    "report_data": 0,
+    "trailing_average": 5,
+    "state_table_name": "smesh-states",
+    "name": "Whiskey",
+    "privacy_mode": 1,
+    "password": "test"
+}
