@@ -1,6 +1,26 @@
 import subprocess
+import json
+from base64 import b64decode
+import socket
+import netifaces
 
 class SmeshLib:
+
+    @staticmethod
+    def _get_local_ip():
+        # Get a list of all network interfaces
+        interfaces = netifaces.interfaces()
+        local_ip = None
+
+        # Find the local IP address of the first non-loopback network interface
+        for interface in interfaces:
+            if interface != 'lo':
+                addrs = netifaces.ifaddresses(interface)
+                if netifaces.AF_INET in addrs:
+                    local_ip = addrs[netifaces.AF_INET][0]['addr']
+                    break
+
+        return local_ip
 
     @staticmethod
     def query_gpu_data():
@@ -40,3 +60,64 @@ class SmeshLib:
         })
 
         return gpu_data
+
+    def query_smesher_data(config):
+        post_data_dir = config["post_data_dir"]
+        nonce = None
+        nonce_value = None
+
+        with open(post_data_dir + '/postdata_metadata.json') as f:
+            metadata = f.read()
+
+        parsed_metadata = json.loads(metadata)
+
+        base64_node_id = parsed_metadata['NodeId']
+
+        # Convert Base64 to Hex
+        hex_node_id = b64decode(base64_node_id).hex()
+
+        base64_commitment_atx_id = parsed_metadata['CommitmentAtxId']
+
+        # Convert Base64 to Hex
+        hex_commitment_atx_id = b64decode(base64_commitment_atx_id).hex()
+
+        num_units = parsed_metadata['NumUnits']
+
+        max_file_size = parsed_metadata['MaxFileSize']
+
+        labels_per_unit = parsed_metadata['LabelsPerUnit']
+
+        hostname = socket.gethostname()
+
+        local_ip = SmeshLib._get_local_ip()
+
+        # Nonce isn't always there, so we will skip it if it doesn't exist
+        try:
+            nonce = parsed_metadata['nonce']
+        except:
+            pass
+
+        try:
+            nonce_value = parsed_metadata['NonceValue']
+        except:
+            pass
+
+        return {
+            "Base64 Node ID": base64_node_id,
+            "Hex Node ID": hex_node_id,
+            "Base64 Commitment ATX ID": base64_commitment_atx_id,
+            "Hex Commitment ATX ID": hex_commitment_atx_id,
+            "NumUnits": num_units,
+            "Max File Size": max_file_size,
+            "Labels Per Unit": labels_per_unit,
+            "Nonce": nonce,
+            "Nonce Value": nonce_value,
+            "Hostname": hostname,
+            "Local IP": local_ip
+        }
+
+    def query_post_data():
+        pass
+
+    def query_status_data():
+        pass

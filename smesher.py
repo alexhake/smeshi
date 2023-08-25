@@ -1,3 +1,5 @@
+import time
+
 class Smesher:
     def __init__(self, config):
         self.smesher_data = {
@@ -67,7 +69,8 @@ class Smesher:
             "Smesher Data": self.smesher_data,
             "GPU Data": self.gpu_data,
             "Post Data": self.post_data,
-            "Status_Data": self.status_data
+            "Status_Data": self.status_data,
+            "Time": time.time() 
         })
 
         # Remove oldest entry
