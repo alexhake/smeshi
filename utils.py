@@ -5,7 +5,7 @@ from datetime import datetime
 import json
 import progressbar
 
-table_name = resource('dynamodb').Table('node-states')
+
 
 def insert_data(pulse, table_name):
     table_name = resource('dynamodb').Table(table_name)
