@@ -1,10 +1,12 @@
 # smeshi
-Spacemesh monitoring suite
+Spacemesh Monitor. Not quite ready for the big time.
 
 ## Setup
 
 ### Config
-Copy the config file into config.json
+Copy the example config file into config.json
+
+Below are explainations of the various options.
 ```
 
 "wait_time": 10, # This is how long between updates in seconds. 10 is recommended minimum
