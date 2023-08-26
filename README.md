@@ -6,7 +6,7 @@ Spacemesh monitoring suite
 ### Config
 Copy the config file into config.json
 ```
-<pre>
+
 "wait_time": 10, # This is how long between updates in seconds. 10 is recommended minimum
 "post_data_dir": "/postcli/postdata", # Location of your post data
 "max_errors": 5, # Max errors before script quits
@@ -22,7 +22,7 @@ Copy the config file into config.json
     "smesher_data": 1, # Displays Smesher data if 1. 0 to turn off
     "status_data": 1 # Displays status data if 1. 0 to turn off
 }
-</pre>
+
 ```
 ### Install Requirements
 pip install -r requirements.txt
