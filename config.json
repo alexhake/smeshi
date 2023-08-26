@@ -1,12 +1,17 @@
 {
-    "wait_time": 5,
+    "wait_time": 10,
     "post_data_dir": "/home/hakehw/Apps/postcli/postdata",
     "max_errors": 5,
-    "report_data": 0,
-    "trailing_average": 5,
+    "report_data": 1,
+    "trailing_average": 10,
     "state_table_name": "smesh-states",
     "name": "Whiskey",
     "privacy_mode": 1,
     "password": "test",
-    "pulse_length": 5
+    "pulse_length": 10,
+    "display": {
+        "gpu_data": 1,
+        "smesher_data": 1,
+        "status_data": 1
+    }
 }

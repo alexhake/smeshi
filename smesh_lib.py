@@ -3,6 +3,10 @@ import json
 from base64 import b64decode
 import socket
 import netifaces
+import os
+import re
+import datetime
+from decimal import Decimal
 
 class SmeshLib:
 
@@ -61,8 +65,7 @@ class SmeshLib:
 
         return gpu_data
 
-    def query_smesher_data(config):
-        post_data_dir = config["post_data_dir"]
+    def query_smesher_data(post_data_dir):
         nonce = None
         nonce_value = None
 
@@ -83,7 +86,7 @@ class SmeshLib:
 
         num_units = parsed_metadata['NumUnits']
 
-        max_file_size = parsed_metadata['MaxFileSize']
+        max_file_size = parsed_metadata['MaxFileSize'] / (1024*1024*1024)
 
         labels_per_unit = parsed_metadata['LabelsPerUnit']
 
@@ -93,7 +96,7 @@ class SmeshLib:
 
         # Nonce isn't always there, so we will skip it if it doesn't exist
         try:
-            nonce = parsed_metadata['nonce']
+            nonce = parsed_metadata['Nonce']
         except:
             pass
 
@@ -108,7 +111,7 @@ class SmeshLib:
             "Base64 Commitment ATX ID": base64_commitment_atx_id,
             "Hex Commitment ATX ID": hex_commitment_atx_id,
             "NumUnits": num_units,
-            "Max File Size": max_file_size,
+            "Max File Size": Decimal(max_file_size),
             "Labels Per Unit": labels_per_unit,
             "Nonce": nonce,
             "Nonce Value": nonce_value,
@@ -116,8 +119,70 @@ class SmeshLib:
             "Local IP": local_ip
         }
 
-    def query_post_data():
-        pass
+    def query_post_data(post_data_dir):
+        post_data_size = 0
+        file_metadata = []
 
-    def query_status_data():
+        # Iterate through the files in the directory
+        for filename in os.listdir(post_data_dir):
+            if filename.startswith('postdata_') and filename.endswith('.bin'):
+                file_path = os.path.join(post_data_dir, filename)
+                match = re.search(r'_(\d+)\.', filename)
+
+                # Get the file size
+                size = os.path.getsize(file_path)
+                post_data_size += size
+                file_metadata.append({
+                    'File Name': filename,
+                    'Size MiB': str(size / (1024 * 1024)),
+                    'Index': int(match.group(1))
+                })
+
+                if(len(file_metadata) > 5):
+                    file_metadata.pop()
+
+        return {
+            "Post Data Size GiB": str(post_data_size / (1024*1024*1024)),
+            "Post Data Size": post_data_size,
+            "File Metadata": file_metadata
+        }
+
+    def query_status_data(config, pulse):
+        if(len(pulse) < config['trailing_average']):
+            return {
+                'Hours to Completion': "Waiting for more data",
+                'Estimated Completion Time': "Waiting for more data",
+                'Speed': "Waiting for more data"
+            }
+        
+        total_post_data_size = pulse[0]["Smesher Data"]["NumUnits"] * 64
+        speeds = []
+        for i in range(1, len(pulse)):
+            time_diff = pulse[i]["Heartbeat"] - pulse[i - 1]["Heartbeat"]
+            size_diff = pulse[i]['Post Data']["Post Data Size"] - pulse[i - 1]['Post Data']["Post Data Size"]
+            size_diff_mib = size_diff / (1024 * 1024)  # Convert bytes to MiB
+            speed = size_diff_mib / time_diff  # MiB per second
+            speeds.append(speed)
+
+        average_speed = sum(speeds) / len(speeds)
+
+        if(average_speed == 0):
+            return {
+                'Hours to Completion': "Waiting for speed to go above 0 MiB/s",
+                'Estimated Completion Time': "Waiting for speed to go above 0 MiB/s",
+                'Speed': "Waiting for speed to go above 0 MiB/s"
+            }
+        
+        time_seconds = (total_post_data_size * 1024) / average_speed
+        time_hours = time_seconds / 3600
+        current_time = datetime.datetime.now()
+        completion_time = current_time + datetime.timedelta(seconds=time_seconds)
+
+        return {
+            'Hours to Completion': str(time_hours),
+            'Estimated Completion Time': completion_time,
+            'Speed': str(average_speed)
+        }
+
+    def query_completion_criteria(pulse):
         pass

@@ -1,4 +1,5 @@
 import time
+from decimal import Decimal
 
 class Smesher:
     def __init__(self, config):
@@ -35,6 +36,8 @@ class Smesher:
             "Post Data Completed": None,
         }
         self.pulse = []
+        self.is_completed = False
+        self.completion_time = None
         self.config = config
 
     def get_smesher_data(self):
@@ -52,6 +55,12 @@ class Smesher:
     def get_pulse(self):
         return self.pulse
     
+    def get_completion_time(self):
+        return self.completion_time
+    
+    def get_is_completed(self):
+        return self.is_completed
+    
     def set_smesher_data(self, smesher_data):
         self.smesher_data = smesher_data
     
@@ -64,13 +73,21 @@ class Smesher:
     def set_status_data(self, status_data):
         self.status_data = status_data
 
+    def set_completion_time(self, completion_time):
+        self.completion_time = completion_time
+
+    def set_is_completed(self, is_completed):
+        self.is_completed = is_completed
+
     def set_pulse(self):
         self.pulse.append({
             "Smesher Data": self.smesher_data,
             "GPU Data": self.gpu_data,
             "Post Data": self.post_data,
-            "Status_Data": self.status_data,
-            "Time": time.time() 
+            "Status Data": self.status_data,
+            "Heartbeat": Decimal(time.time()),
+            "Completed": self.is_completed,
+            "Completion Time": self.completion_time
         })
 
         # Remove oldest entry
