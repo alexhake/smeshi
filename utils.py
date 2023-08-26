@@ -93,3 +93,13 @@ def display_data(pulse, config):
     if(config["display"]["status_data"] == 1):
         print(table + '\n')
 
+def insert_highest_atx(highest_atx):
+    table_name = resource('dynamodb').Table('highest_atx')
+    
+    response = table_name.put_item(
+        Item = {
+            'highest_atx': highest_atx
+        }
+    )
+
+    return response
