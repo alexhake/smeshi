@@ -156,24 +156,31 @@ class SmeshLib:
             }
         
         total_post_data_size = pulse[0]["Smesher Data"]["NumUnits"] * 64
-        speeds = []
-        for i in range(1, len(pulse)):
-            time_diff = pulse[i]["Heartbeat"] - pulse[i - 1]["Heartbeat"]
-            size_diff = pulse[i]['Post Data']["Post Data Size"] - pulse[i - 1]['Post Data']["Post Data Size"]
+
+
+        # speeds = []
+        # for i in range(1, len(pulse)):
+        #     time_diff = pulse[i]["Heartbeat"] - pulse[i - 1]["Heartbeat"]
+        #     size_diff = pulse[i]['Post Data']["Post Data Size"] - pulse[i - 1]['Post Data']["Post Data Size"]
+        #     size_diff_mib = size_diff / (1024 * 1024)  # Convert bytes to MiB
+        #     speed = size_diff_mib / float(time_diff)  # MiB per second
+        #     speeds.append(speed)
+        speed = 0
+        # average_speed = sum(speeds) / len(speeds)
+        if len(pulse) > 0:
+            size_diff = pulse[-1]['Post Data']["Post Data Size"] - pulse[0]['Post Data']["Post Data Size"]
+            time_diff = pulse[-1]["Heartbeat"] - pulse[0]["Heartbeat"]
             size_diff_mib = size_diff / (1024 * 1024)  # Convert bytes to MiB
             speed = size_diff_mib / float(time_diff)  # MiB per second
-            speeds.append(speed)
 
-        average_speed = sum(speeds) / len(speeds)
-
-        if(average_speed == 0):
+        if(speed == 0):
             return {
                 'Hours to Completion': "Waiting for speed to go above 0 MiB/s",
                 'Estimated Completion Time': "Waiting for speed to go above 0 MiB/s",
                 'Speed': "Waiting for speed to go above 0 MiB/s"
             }
         
-        time_seconds = (total_post_data_size * 1024) / average_speed
+        time_seconds = (total_post_data_size * 1024) / speed
         time_hours = time_seconds / 3600
         current_time = datetime.datetime.now()
         completion_time = current_time + datetime.timedelta(seconds=time_seconds)
@@ -184,7 +191,7 @@ class SmeshLib:
         return {
             'Hours to Completion': str(round(time_hours, 2)),
             'Estimated Completion Time': iso8601_string,
-            'Speed': str(round(average_speed, 2))
+            'Speed': str(round(speed, 2))
         }
 
     def query_completion_criteria(pulse):
