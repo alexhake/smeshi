@@ -161,7 +161,7 @@ class SmeshLib:
             time_diff = pulse[i]["Heartbeat"] - pulse[i - 1]["Heartbeat"]
             size_diff = pulse[i]['Post Data']["Post Data Size"] - pulse[i - 1]['Post Data']["Post Data Size"]
             size_diff_mib = size_diff / (1024 * 1024)  # Convert bytes to MiB
-            speed = size_diff_mib / time_diff  # MiB per second
+            speed = size_diff_mib / float(time_diff)  # MiB per second
             speeds.append(speed)
 
         average_speed = sum(speeds) / len(speeds)
@@ -178,9 +178,12 @@ class SmeshLib:
         current_time = datetime.datetime.now()
         completion_time = current_time + datetime.timedelta(seconds=time_seconds)
 
+        iso8601_string = completion_time.isoformat()
+
+
         return {
             'Hours to Completion': str(round(time_hours, 2)),
-            'Estimated Completion Time': completion_time,
+            'Estimated Completion Time': iso8601_string,
             'Speed': str(round(average_speed, 2))
         }
 
