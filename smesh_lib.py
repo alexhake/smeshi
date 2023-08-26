@@ -179,9 +179,9 @@ class SmeshLib:
         completion_time = current_time + datetime.timedelta(seconds=time_seconds)
 
         return {
-            'Hours to Completion': str(time_hours),
+            'Hours to Completion': str(round(time_hours, 2)),
             'Estimated Completion Time': completion_time,
-            'Speed': str(average_speed)
+            'Speed': str(round(average_speed, 2))
         }
 
     def query_completion_criteria(pulse):

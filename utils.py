@@ -3,13 +3,12 @@ from boto3.dynamodb.conditions import Attr, Key
 from tabulate import tabulate
 from datetime import datetime
 import json
+import progressbar
 
 table_name = resource('dynamodb').Table('node-states')
 
 def insert_data(pulse, table_name):
     table_name = resource('dynamodb').Table(table_name)
-
-    print(pulse)
     
     response = table_name.put_item(
         Item = {
@@ -17,8 +16,6 @@ def insert_data(pulse, table_name):
             'pulse': pulse
         }
     )
-
-    print(response)
 
     return response
 
@@ -35,6 +32,9 @@ def display_data(pulse, config):
     post_data = pulse[-1]["Post Data"]
     status_data = pulse[-1]["Status Data"]
 
+    progress = (float(post_data["Post Data Size GiB"]) / float(smesher_data["NumUnits"]*64)) * 100
+
+
     nonce_found = False
     if smesher_data["Nonce"] and smesher_data["Nonce Value"]:
         nonce_found = True
@@ -43,7 +43,7 @@ def display_data(pulse, config):
 
     # Format the datetime object as a human-readable string
     human_readable_time = dt_object.strftime("%Y-%m-%d %H:%M:%S")
-    print(f'Last Updated: {human_readable_time}')
+    print(f'Last Updated: {human_readable_time} | Progress: {round(progress,2)}%')
 
     smesher_data_output = [
         ["Smesher Data", "Value"],

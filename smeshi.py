@@ -10,6 +10,7 @@ def start(config):
 
     print(f'Waiting {config["wait_time"]} seconds to get data...')
 
+
     while True:
         
         time.sleep(config['wait_time'])
